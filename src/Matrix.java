@@ -132,6 +132,40 @@ public class Matrix{
         return newmat;
     }
 
+    /**
+     * Method that swaps two rows. Uses zero-based indexing for the rows.
+     * @param row1 the number of one of the rows to be swapped
+     * @param row2 the number of the other row that is being swapped
+     */
+    public void rowSwap(int row1, int row2){
+        float[] temp = mat[row1];
+        mat[row1] = mat[row2];
+        mat[row2] = temp;
+    }
+
+    /**
+     * Multiplies a row by a given multiplier
+     * @param row the index of the row that is being multiplied
+     * @param multiplier the multiplier
+     */
+    public void rowMultiply(int row, float multiplier){
+        for(int i = 0; i < cols; i++)
+            mat[row][i] *= multiplier;
+    }
+
+    /**
+     * Performs row addition and mulitplication on the specified rows.
+     * The order for the parameters goes as so:
+     * (The row that you are multiplying and adding to another row, the multiplier, the row that is being added to)
+     * @param addingRow the index of the row that you are multiplying and adding to another row
+     * @param multiplier the multiplier
+     * @param addedToRow the row that is being added to
+     */
+    public void rowAddition(int addingRow, float multiplier, int addedToRow){
+        for(int i = 0; i < cols; i++)
+            mat[addedToRow][i] += (mat[addingRow][i]*multiplier);
+    }
+
 
     /**
      * Helper method to generate the spacing for the generic toString
@@ -144,7 +178,7 @@ public class Matrix{
         return stringBuilder.toString();
     }
 
-    
+
     /**
      * Generic toString. Will edit later.
      * @return A string representation of the matrix.
