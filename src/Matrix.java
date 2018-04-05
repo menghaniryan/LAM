@@ -1,9 +1,10 @@
 
-public class Matrix {
+public class Matrix{
 
     private float[][] mat; //the matrix
     private int rows, cols;
-    boolean showSteps; //show the steps in row reduction, MIGHT BE ABLE TO DELETE
+    private boolean showSteps; //show the steps in row reduction, MIGHT BE ABLE TO DELETE
+    private int lengthOfLongestEntry; //used to create toString
 
 
     //Some thoughts I am having
@@ -27,6 +28,7 @@ public class Matrix {
         rows = numRows;
         cols = numCols;
         mat = new float[rows][cols];
+        lengthOfLongestEntry = 1;
     }
 
     /**
@@ -37,6 +39,7 @@ public class Matrix {
         rows = num;
         cols = num;
         mat = new float[rows][cols];
+        lengthOfLongestEntry = 1;
     }
 
     /**
@@ -50,6 +53,8 @@ public class Matrix {
         for(int i = 0; i < rows; i++){
             for(int j = 0; j < cols; j++){
                 mat[i][j] = arr[i][j];
+                //this computes the longest entry of the input matrix
+                lengthOfLongestEntry = ((""+arr[i][j]).length() > lengthOfLongestEntry) ?  (""+arr[i][j]).length() : lengthOfLongestEntry;
             }
         }
     }
@@ -65,6 +70,7 @@ public class Matrix {
         for(int i = 0; i < rows; i++){
             for(int j = 0; j < cols; j++){
                 mat[i][j] = arr[i][j];
+                lengthOfLongestEntry = ((""+arr[i][j]).length() > lengthOfLongestEntry) ?  (""+arr[i][j]).length() : lengthOfLongestEntry;
             }
         }
     }
@@ -118,27 +124,45 @@ public class Matrix {
         for(int lhsrows = 0; lhsrows < rows; lhsrows++){
             for(int rhscols = 0; rhscols < other.cols; rhscols++){
                 float sumEntries = 0;
-                for(int sharedDim = 0; sharedDim < cols; sharedDim++){
+                for(int sharedDim = 0; sharedDim < cols; sharedDim++)
                     sumEntries += (mat[lhsrows][sharedDim] * other.mat[sharedDim][rhscols]);
-                }
                 newmat.mat[lhsrows][rhscols] = sumEntries;
             }
         }
         return newmat;
     }
 
+
+    /**
+     * Helper method to generate the spacing for the generic toString
+     * @return
+     */
+    private String generateTabs(){
+        StringBuilder stringBuilder = new StringBuilder();
+        for(int i = 0; i < lengthOfLongestEntry; i++)
+            stringBuilder.append("\t");
+        return stringBuilder.toString();
+    }
+
+    
     /**
      * Generic toString. Will edit later.
      * @return A string representation of the matrix.
      */
     public String toString(){
-        String print = "";
+        StringBuilder builder = new StringBuilder();
+        String tab = generateTabs();
         for(int i = 0; i < rows; i++){
+            builder.append("|");
             for(int j = 0; j < cols; j++){
-                print += mat[i][j]+"\t";
+                builder.append(mat[i][j]);
+                if(j != cols-1) {
+                    builder.append(",");
+                    builder.append(tab);
+                }
             }
-            print+="\n";
+            builder.append("|\n");
         }
-        return print;
+        return builder.toString();
     }
 }
