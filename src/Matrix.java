@@ -9,14 +9,12 @@ public class Matrix{
 
     //Some thoughts I am having
     /*
-        - Should the operations on the matrix return another matrix, or should it just edit the current matrix?
-        - How should the standard operations work? Should I always treat this matrix as the left hand side of the other argument
         - What functions can I actually implement?
         - How will I show my steps in the row reduction algorithm?
         - How fast will this be, and is using floating point the best way to go about doing this?
         - Will I be able to do the thing where I don't have to turn the numbers into decimals in order to do row reduction?
         - Output format for floats, since they don't round evenly, so they will have multiple decimal point
-        -USE GENERICS!!!!!!!!!!!!!!! <<<<<<<<<<<
+        - USE GENERICS!!!!!!!!!!!!!!! <<<<<<<<<<<
     */
 
     /**
@@ -148,7 +146,7 @@ public class Matrix{
      * @param row the index of the row that is being multiplied
      * @param multiplier the multiplier
      */
-    public void rowMultiply(int row, float multiplier){
+    public void rowMultiply(int row, double multiplier){
         for(int i = 0; i < cols; i++)
             mat[row][i] *= multiplier;
     }
@@ -164,6 +162,81 @@ public class Matrix{
     public void rowAddition(int addingRow, float multiplier, int addedToRow){
         for(int i = 0; i < cols; i++)
             mat[addedToRow][i] += (mat[addingRow][i]*multiplier);
+    }
+
+    public void RREF(boolean showSteps) throws Exception {
+        boolean foundCol = false;
+        int currPivCol = 0;
+        while(currPivCol < mat.length && !foundCol){
+            if(!isColZeroes(currPivCol))
+                foundCol = true;
+            else
+                currPivCol++;
+        }
+
+        //if no pivot column found, there is nothing we can do!
+        if(!foundCol)
+            throw new Exception("No pivot columns ya dingus!");
+
+        int pivotRow = getPivotRow(currPivCol);
+
+        //move the row into the pivot position
+        if(pivotRow != currPivCol)
+            rowSwap(pivotRow, currPivCol);
+
+        //multiply all the values in the pivot row by the reciprocal of the value at the pivot position
+        applyPivotRowOperations(pivotRow, currPivCol);
+
+        //Zero out all the rows below it
+        zeroOutRowsBelow(pivotRow, currPivCol);
+
+    }
+
+    public void zeroOutRowsBelow(int pivRow, int pivCol){
+        for(int i = pivRow+1; i < mat.length; i++){
+            //the value I need to do this subtraction by is just the value underneath the pivot rows value
+            rowAddition(pivRow, mat[i][pivCol] * -1, i);
+        }
+    }
+
+    /**
+     * Helper method that basically multiplies all the numbers in a row by the pivot positions reciprocal, which sets up
+     * the rest of the rref alogrithm.
+     * @param pivRow the pivot row
+     * @param pivCol the pivot column
+     */
+    public void applyPivotRowOperations(int pivRow, int pivCol){
+        double reciprocal = (1.0)/(mat[pivRow][pivCol]);
+        rowMultiply(pivRow, reciprocal);
+    }
+
+
+    /**
+     * Given a pivot column, find the row that contains the pivot value. This is done by selecting the row with the
+     * greatest absolute value.
+     * @param pivotColumn the current column you are working with
+     * @return the row that should be used as the pivot row
+     */
+    public int getPivotRow(int pivotColumn){
+        int pivRow = 0;
+        for(int i = 1; i < mat.length; i++){
+            if(Math.abs(mat[i][pivotColumn]) > Math.abs(mat[pivRow][pivotColumn]))
+                pivRow = i;
+        }
+        return pivRow;
+    }
+
+    /**
+     * Helper method for RREF to determine if a column is full of only zeroes.
+     * @param col the column to determine is only zeroes
+     * @return true if the column is only zeroes
+     */
+    public boolean isColZeroes(int col){
+        for(int i = 0; i < mat.length; i++){
+            if(mat[i][col] != 0)
+                return false;
+        }
+        return true;
     }
 
 
