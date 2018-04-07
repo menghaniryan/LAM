@@ -74,6 +74,7 @@ public class Matrix{
     }
 
 
+
     /**
      * Multiply the entire matrix by a scalar constant
      * @param constant the scalar constant to multiply the matrix by
@@ -193,8 +194,89 @@ public class Matrix{
             //Zero out all the rows below it
             zeroOutRowsBelow(pivotRow, currPivCol);
         }
-
     }
+
+    /**
+     * Recursively determines the determinant through Gaussian elimination.
+     * @return the determinant of this matrix
+     */
+    public double determinant(Matrix detMatrix){
+        if(detMatrix.rows != detMatrix.cols)
+            throw new IllegalStateException("Cannot calculate determinant on a non-square matrix");
+        if(detMatrix.rows == 2)
+            return twoByTwoDeterminant(detMatrix);
+        if(detMatrix.rows == 3)
+            return threeByThreeDeterminant(detMatrix);
+        return 0.0;
+    }
+
+
+    /**
+     * Helper method to calculate the determinant of a three by three matrix in constant time
+     * @param threeByThree the three by three matrix
+     * @return the determinant of a three by three matrix
+     */
+    public double threeByThreeDeterminant(Matrix threeByThree){
+        System.out.println(threeByThree.rows + " " + threeByThree.cols);
+        double total = 0.0;
+        for(int i = 0; i < 3; i++)
+            total += diagonalDownMultiplication(0, i, threeByThree);
+        for(int i = 0; i < 3; i++)
+            total -= diagonalUpMultiplication(2, i, threeByThree);
+        return total;
+    }
+
+    /**
+     * A helper method to make finding three by three matrix determinants more elegant
+     * @param startingRow the starting row
+     * @param startingCol the starting col
+     * @param threeByThree the three by three matrix
+     * @return the product of the diagonal of the going downward from the specific row and col
+     */
+    private double diagonalDownMultiplication(int startingRow, int startingCol, Matrix threeByThree){
+        double product = 1.0;
+        int row = startingRow, col = startingCol;
+        int count = 0;
+        while(count < 3){
+            product *= threeByThree.mat[row][col];
+            row = (row + 1 == 3) ? 0 : ++row;
+            col = (col + 1 == 3) ? 0 : ++col;
+            count++;
+        }
+        return product;
+    }
+
+    /**
+     * A helper method to make finding three by three matrix determinants more elegant
+     * @param startingRow the starting row
+     * @param startingCol the starting col
+     * @param threeByThree the three by three matrix
+     * @return the product of the diagonal of the going downward from the specific row and col
+     */
+    private double diagonalUpMultiplication(int startingRow, int startingCol, Matrix threeByThree){
+        double product = 1.0;
+        int row = startingRow, col = startingCol;
+        int count = 0;
+        while(count < 3){
+            product *= threeByThree.mat[row][col];
+            --row;
+            col = (col + 1 == 3) ? 0 : ++col;
+            count++;
+        }
+        return product;
+    }
+
+    /**
+     * Helper method that returns the determinant of a two by two matrix
+     * @param twoByTwo the two by two matrix that is passed in
+     * @return the determinant of the two by two matrix
+     */
+    private double twoByTwoDeterminant(Matrix twoByTwo){
+        if(twoByTwo.rows != 2)
+            throw new IllegalArgumentException("Matrix is not a two by two matrix");
+        return twoByTwo.mat[0][0]*mat[1][1] - twoByTwo.mat[0][1]*twoByTwo.mat[1][0];
+    }
+
 
     /**
      * Zeroes out all the entries below a specified pivot position.
