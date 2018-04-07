@@ -164,34 +164,43 @@ public class Matrix{
             mat[addedToRow][i] += (mat[addingRow][i]*multiplier);
     }
 
-    public void RREF(boolean showSteps) throws Exception {
+    /**
+     * A method that reduces the current matrix into echelon form.
+     * @param showSteps whether the computer should show it's steps or not.
+     */
+    public void echelonForm(boolean showSteps){
         boolean foundCol = false;
-        int currPivCol = 0;
-        while(currPivCol < mat.length && !foundCol){
-            if(!isColZeroes(currPivCol))
+        for(int currPivCol = 0; currPivCol < mat.length; currPivCol++) {
+            if (!isColZeroes(currPivCol))
                 foundCol = true;
             else
-                currPivCol++;
+                continue;
+
+            //if no pivot column found, there is nothing we can do!
+            if (!foundCol)
+                throw new IllegalArgumentException("No pivot columns ya dingus! CHANGE THIS TO THE CORRECT EXCEPTION.");
+
+            int pivotRow = getPivotRow(currPivCol);
+
+            //move the row into the pivot position
+            if (pivotRow != currPivCol)
+                rowSwap(pivotRow, currPivCol);
+            pivotRow = currPivCol;
+
+            //multiply all the values in the pivot row by the reciprocal of the value at the pivot position
+            applyPivotRowOperations(pivotRow, currPivCol);
+
+            //Zero out all the rows below it
+            zeroOutRowsBelow(pivotRow, currPivCol);
         }
-
-        //if no pivot column found, there is nothing we can do!
-        if(!foundCol)
-            throw new Exception("No pivot columns ya dingus!");
-
-        int pivotRow = getPivotRow(currPivCol);
-
-        //move the row into the pivot position
-        if(pivotRow != currPivCol)
-            rowSwap(pivotRow, currPivCol);
-
-        //multiply all the values in the pivot row by the reciprocal of the value at the pivot position
-        applyPivotRowOperations(pivotRow, currPivCol);
-
-        //Zero out all the rows below it
-        zeroOutRowsBelow(pivotRow, currPivCol);
 
     }
 
+    /**
+     * Zeroes out all the entries below a specified pivot position.
+     * @param pivRow the pivot row
+     * @param pivCol the pivot col
+     */
     public void zeroOutRowsBelow(int pivRow, int pivCol){
         for(int i = pivRow+1; i < mat.length; i++){
             //the value I need to do this subtraction by is just the value underneath the pivot rows value
@@ -218,8 +227,8 @@ public class Matrix{
      * @return the row that should be used as the pivot row
      */
     public int getPivotRow(int pivotColumn){
-        int pivRow = 0;
-        for(int i = 1; i < mat.length; i++){
+        int pivRow = pivotColumn;
+        for(int i = pivotColumn+1; i < mat.length; i++){
             if(Math.abs(mat[i][pivotColumn]) > Math.abs(mat[pivRow][pivotColumn]))
                 pivRow = i;
         }
