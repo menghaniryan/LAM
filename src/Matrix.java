@@ -109,6 +109,10 @@ public class Matrix{
         mat[row][col] = newVal;
     }
 
+    public float getEntry(int row, int col){
+        return mat[row][col];
+    }
+
     /**
      * Multiplying two matrices, returning the output in a new matrix. This multiplication puts this matrix on the lhs, the other matrix on the rhs.
      * Note - this algo uses the generic algorithm for matrix multiplication. A faster way to implement would be to use the strassen algorithm. Finally,
@@ -197,17 +201,40 @@ public class Matrix{
     }
 
     /**
-     * Recursively determines the determinant through Gaussian elimination.
+     * Recursively determines the determinant through cofactor expansion.
      * @return the determinant of this matrix
      */
     public double determinant(Matrix detMatrix){
         if(detMatrix.rows != detMatrix.cols)
             throw new IllegalStateException("Cannot calculate determinant on a non-square matrix");
+        if(detMatrix.rows == 1)
+            return detMatrix.mat[0][0];
         if(detMatrix.rows == 2)
             return twoByTwoDeterminant(detMatrix);
         if(detMatrix.rows == 3)
             return threeByThreeDeterminant(detMatrix);
-        return 0.0;
+        //loop through the top row of entries
+        double det = 0.0;
+        for(int i = 0; i < detMatrix.mat.length; i++){
+            //create a submatrix that i can that I can take the determinant of
+            Matrix tempMatrix = new Matrix(detMatrix.rows-1);
+
+            //loop through the current matrix and input the current values
+            int subMatX = 0;
+            int subMatY = 0;
+            for(int j = 1; j < detMatrix.mat.length; j++){ //start from one because I don't need to  check the top row,
+                for(int k = 0; k < detMatrix.mat.length; k++){ //loop through submatrix cols
+                    if(k == i) //if the submatrix col == cofactor col, skip it
+                        continue;
+                    tempMatrix.editEntry(subMatX, subMatY, detMatrix.getEntry(j, k));
+                    subMatY++;
+                }
+                subMatX++;
+            }
+            det += Math.pow(-1, i)*(detMatrix.getEntry(0, i)) + determinant(tempMatrix);
+        }
+
+        return det;
     }
 
 
